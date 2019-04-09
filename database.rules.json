@@ -1,7 +1,103 @@
+// These rules grant access to a node matching the authenticated
+// user's ID from the Firebase auth token
 {
-  /* Visit https://firebase.google.com/docs/database/security to learn more about security rules. */
   "rules": {
-    ".read": false,
-    ".write": false
+    ".read": true,
+    ".write": true,
+    "users": {
+      "$uid": {
+        ".read": "$uid === auth.uid",
+        ".write": "$uid === auth.uid"
+      }
+      // ".indexOn": ["firstname", "lastname"],
+      // ".read": true,
+      // ".write": true
+    },
+    "purchase_order":{
+      // "$uid": {
+        ".indexOn": ["date", "reverseDate", "client_name", "project_name", "issued_po_plant"],
+        ".read": true,
+        ".write": true
+      // }
+    },
+    "purchase_order_closed":{
+      // "$uid": {
+        ".read": true,
+        ".write": true,
+        ".indexOn": ["date", "reverseDate", "po_no_key"]
+      // }
+    },
+    "delivery_ongoing_order": {
+      // "$uid": {
+        ".read": true,
+        ".write": true,
+        ".indexOn": ["issued_dr_plant", "date", "reverseDate", "po_no_key"]
+      // }
+    },
+    "client": {
+      // "$uid": {
+        ".read": true,
+        ".write": true
+      // }
+    },
+    "project": {
+      // "$uid": {
+        ".read": true,
+        ".write": true
+      // }
+    },
+    "item": {
+      ".read": true,
+      ".write": true
+    },
+    "delivery_delivered_order": {
+      // "$uid": {
+        ".read": true,
+        ".write": true,
+        ".indexOn": ["delivered_plant", "date", "reverseDate", "po_no_key"]
+      // }
+    },
+    "delivery_backloaded_order": {
+      // "$uid": {
+        ".read": true,
+        ".write": true,
+        ".indexOn": ["backloaded_plant", "date", "reverseDate", "po_no_key"]
+      // }
+    },
+    "history": {
+      "$uid": {
+        ".read": true,
+        ".write": true,
+        ".indexOn": ["date", "reverseDate", "po_no_key"]
+      }
+    },
+    "incoming_diesel": {
+      "$uid": {
+         ".read": true,
+         ".write": true,
+         ".indexOn": ["reverseDate", "date"]
+      }
+    },
+    "attendance": {
+      "$uid": {
+        ".read": true,
+        ".write": true,
+        ".indexOn": ["employee_name"]
+      }
+    },
+    "employee_list": {
+      "$uid": {
+        ".read": true,
+        ".write": true,
+        ".indexOn": ["employee_name"]
+      }
+    },
+    "diesel_category": {
+      "$uid": {
+        ".read": true,
+        ".write": true,
+        ".indexOn": ["reverseDate"]
+      }
+    }
   }
 }
