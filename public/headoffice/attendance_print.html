@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Creative - Bootstrap 3 Responsive Admin Template">
+    <meta name="author" content="GeeksLabs">
+    <meta name="keyword" content="Creative, Dashboard, Admin, Template, Theme, Bootstrap, Responsive, Retina, Minimal">
+    <link rel="shortcut icon" href="../img/favicon.png">
+
+    <title>Attendance</title>
+
+    <!-- Firebase App is always required and must be first -->
+    <script src="https://www.gstatic.com/firebasejs/5.0.1/firebase-app.js"></script>
+
+    <!-- Add additional services you want to use -->
+    <script src="https://www.gstatic.com/firebasejs/5.0.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.0.1/firebase-database.js"></script>
+    <script src="../js_config/firebase_config.js"></script>
+
+    <!-- Bootstrap CSS -->    
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <!-- bootstrap theme -->
+    <link href="../css/bootstrap-theme.css" rel="stylesheet">
+    <!--external css-->
+    <!-- font icon -->
+    <link href="../css/elegant-icons-style.css" rel="stylesheet" />
+    <link href="../css/font-awesome.min.css" rel="stylesheet" />    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- owl carousel -->
+    <link rel="stylesheet" href="../css/owl.carousel.css" type="text/css">
+    <link href="../css/jquery-jvectormap-1.2.2.css" rel="stylesheet">
+    <!-- Custom styles -->
+    <link rel="stylesheet" href="../css/fullcalendar.css">
+    <link href="../css/widgets.css" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+    <link href="../css/style-responsive.css" rel="stylesheet" />
+    <link href="../css/xcharts.min.css" rel=" stylesheet">  
+    <link href="../css/jquery-ui-1.10.4.min.css" rel="stylesheet">
+
+    <!-- javascripts -->
+    <script src="../js/jquery.js"></script>
+    <script src="../js/jquery-ui-1.10.4.min.js"></script>
+    <script src="../js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="../js/jquery-ui-1.9.2.custom.min.js"></script>
+    <!-- bootstrap -->
+    <script src="../js/bootstrap.min.js"></script>
+    <!-- nice scroll -->
+    <script src="../js/jquery.scrollTo.min.js"></script>
+    <script src="../js/jquery.nicescroll.js" type="text/javascript"></script>
+    <!-- charts scripts -->
+    <script src="../assets/jquery-knob/js/jquery.knob.js"></script>
+    <script src="../js/jquery.sparkline.js" type="text/javascript"></script>
+    <script src="../assets/jquery-easy-pie-chart/jquery.easy-pie-chart.js"></script>
+    <script src="../js/owl.carousel.js" ></script>
+    <!-- jQuery full calendar -->
+    <script src="../js/fullcalendar.min.js"></script> <!-- Full Google Calendar - Calendar -->
+    <script src="../assets/fullcalendar/fullcalendar/fullcalendar.js"></script>
+    <!--script for this page only-->
+    <script src="../js/calendar-custom.js"></script>
+    <script src="../js/jquery.rateit.min.js"></script>
+    <!-- custom select -->
+    <script src="../js/jquery.customSelect.min.js" ></script>
+    <script src="../assets/chart-master/Chart.js"></script>
+
+    <!--custome script for all page-->
+    <script src="../js/scripts.js"></script>
+    <!-- custom script for this page-->
+    <script src="../js/sparkline-chart.js"></script>
+    <script src="../js/easy-pie-chart.js"></script>
+    <script src="../js/jquery-jvectormap-1.2.2.min.js"></script>
+    <script src="../js/jquery-jvectormap-world-mill-en.js"></script>
+    <script src="../js/xcharts.min.js"></script>
+    <script src="../js/jquery.autosize.min.js"></script>
+    <script src="../js/jquery.placeholder.min.js"></script>
+    <script src="../js/gdp-data.js"></script>  
+    <script src="../js/morris.min.js"></script>
+    <script src="../js/sparklines.js"></script>    
+    <script src="../js/charts.js"></script>
+    <script src="../js/jquery.slimscroll.min.js"></script>
+    <script src="../js_config/function.js"></script>
+
+    <!-- =======================================================
+    Theme Name: NiceAdmin
+    Theme URL: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/
+    Author: BootstrapMade
+    Author URL: https://bootstrapmade.com
+    ======================================================= -->
+
+<script>
+
+    var plant = getUrlParameter('plant');
+    var date = getUrlParameter('date');
+    var type = getUrlParameter('type');
+    var option = {year: "numeric", month: "long", day: "numeric"}
+    var option1 = {weekday: 'long', year: "numeric", month: "long", day: "numeric"};
+    var currentDate = new Date(date).toLocaleDateString('en', option);
+    var currentDate1 = new Date(date);
+    var myTableOfficeEmployee = "";
+    var myTableNewEmployee = "";
+    var myTableAbsent = "";
+    var myTableNonskid = "";
+    var myTableTrucking = "";
+    var myTableForklift = "";
+    var myTableDayshiftGuard = "";
+    var myTableNightshiftGuard = "";
+    var myTableComment = "";
+    var yesterdayDate = currentDate1.setDate(currentDate1.getDate() - 1);
+    yesterdayDate = new Date(yesterdayDate).toLocaleDateString('en');
+    yesterdayFullDate = new Date(yesterdayDate).toLocaleDateString('en', option);
+    todayDate = new Date(currentDate).toLocaleDateString('en');
+    
+    $(document).ready(function(){
+        
+        firebase.database().ref('attendance/'+plant+'/'+yesterdayFullDate).once('value', function(yesterdayData){
+
+            if(yesterdayData.val() != null){
+
+                $(".class_yesterday").text("(" + yesterdayDate + ")");
+
+            }else{
+
+                // var beforeYesterdayDate = currentDate1.setDate(currentDate1.getDate() - 1);
+                // beforeYesterdayDate = new Date(beforeYesterdayDate).toLocaleDateString('en');
+                // $(".class_yesterday").text(beforeYesterdayDate);
+
+                value = 0;
+                todayTime = new Date(currentDate1).getTime();
+
+                firebase.database().ref('attendance/'+plant).once('value', function(lastDateData){
+                    lastDateData.forEach(function(lastDateChildData){
+
+                        time = new Date(lastDateChildData.key).getTime();
+
+                        if(time > value && time != todayTime && time < todayTime){
+                            value = time;
+                        }
+                    });
+
+                    if(value != 0){
+                        timedate = new Date(value);
+                        beforeYesterdayDate = timedate.toLocaleDateString('en');
+                        // document.getElementById('id_yesterday').innerHTML = "(" + beforeYesterdayDate + ")";
+                        $(".class_yesterday").text("(" + beforeYesterdayDate + ")");
+                    }
+                });
+            }
+        });
+
+        $(".class_today").text("(" + todayDate + ")");
+
+        document.getElementById('page_header').innerHTML = plant + " ATTENDANCE";
+
+        document.getElementById('id_date').innerHTML = "<th colspan='4'>Date: " + new Date(currentDate).toLocaleDateString('en', option1) + " <button class='btn btn-success' id='printPageButton' onclick='window.print();' style='float: right;'><span class='fa fa-print'></span> <strong>Print</strong></button> <br> <span id='id_schedule'></span></th>";
+
+
+        firebase.database().ref('attendance/'+plant+'/'+currentDate).once('value', function(attendanceSnapshot){
+
+            if(attendanceSnapshot.val() != null){
+
+                if(type == "old"){
+                    query_ext = "";
+                }else if(type == "new"){
+                    query_ext = "/new";
+                }
+
+                firebase.database().ref('attendance/'+plant+'/'+currentDate+query_ext).once('value', function(schedSnapshot){
+
+                    document.getElementById('id_schedule').innerHTML = "Schedule: " + schedSnapshot.val().schedule;
+                });
+
+                firebase.database().ref('attendance/'+plant+'/'+currentDate+query_ext+'/office').orderByChild('employee_name').once('value', function(officeSnapshot){
+                    firebase.database().ref('attendance/'+plant+'/'+currentDate+query_ext+'/new_employee').orderByChild('employee_name').once('value', function(newEmployeeSnapshot){
+
+                        officeSnapshot.forEach(function(officeChildSnapshot){
+
+                            var employee_name = officeChildSnapshot.val().employee_name;
+                            var employee_timein = officeChildSnapshot.val().employee_timein;
+                            var employee_timeout = officeChildSnapshot.val().employee_timeout;
+
+                            myTableOfficeEmployee += "<tr align='center'><td>" + employee_name + "</td><td>" + employee_timein + "</td><td>" + employee_timeout + "</td></tr>";
+
+                        });
+
+                        document.getElementById('row_office_list').innerHTML = myTableOfficeEmployee;
+
+                        newEmployeeSnapshot.forEach(function(newEmployeeChildSnapshot){
+
+                            var employee_name = newEmployeeChildSnapshot.val().employee_name;
+
+                            myTableNewEmployee += "<div class='row'><div class='col-md-12'>" + employee_name + "</div></div>";
+                        });
+
+                        document.getElementById('row_new_employee_list').innerHTML = myTableNewEmployee;
+                    });
+                });
+
+                firebase.database().ref('attendance/'+plant+'/'+currentDate+query_ext+'/nonskid1/employee').orderByChild('employee_name').once('value', function(nonskid1Snapshot){
+                    firebase.database().ref('attendance/'+plant+'/'+currentDate+query_ext+'/nonskid2/employee').orderByChild('employee_name').once('value', function(nonskid2Snapshot){
+                        firebase.database().ref('attendance/'+plant+'/'+currentDate+query_ext+'/nonskid3/employee').orderByChild('employee_name').once('value', function(nonskid3Snapshot){
+                            firebase.database().ref('attendance/'+plant+'/'+currentDate+query_ext+'/nonskid4/employee').orderByChild('employee_name').once('value', function(nonskid4Snapshot){
+                                firebase.database().ref('attendance/'+plant+'/'+currentDate+query_ext+'/nonskid1/helper').orderByChild('employee_name').once('value', function(nonskid1HelperSnapshot){
+                                    firebase.database().ref('attendance/'+plant+'/'+currentDate+query_ext+'/nonskid2/helper').orderByChild('employee_name').once('value', function(nonskid2HelperSnapshot){
+                                        firebase.database().ref('attendance/'+plant+'/'+currentDate+query_ext+'/nonskid3/helper').orderByChild('employee_name').once('value', function(nonskid3HelperSnapshot){
+                                            firebase.database().ref('attendance/'+plant+'/'+currentDate+query_ext+'/nonskid4/helper').orderByChild('employee_name').once('value', function(nonskid4HelperSnapshot){
+
+                                                myTableNonskid += "<tr><td colspan='1'>";
+
+                                                nonskid1Snapshot.forEach(function(nonskid1ChildSnapshot){
+
+                                                    var employee_name = nonskid1ChildSnapshot.val().employee_name;
+
+                                                    myTableNonskid += "<div class='row'><div class='col-md-12'>" + employee_name + "</div></div>";
+                                                });
+
+                                                myTableNonskid += "</td><td>";
+
+                                                nonskid2Snapshot.forEach(function(nonskid2ChildSnapshot){
+
+                                                    var employee_name = nonskid2ChildSnapshot.val().employee_name;
+
+                                                    myTableNonskid += "<div class='row'><div class='col-md-12'>" + employee_name + "</div></div>";
+                                                });
+
+                                                myTableNonskid += "</td><td>";
+
+                                                nonskid3Snapshot.forEach(function(nonskid3ChildSnapshot){
+
+                                                    var employee_name = nonskid3ChildSnapshot.val().employee_name;
+
+                                                    myTableNonskid += "<div class='row'><div class='col-md-12'>" + employee_name + "</div></div>";
+                                                });
+
+                                                myTableNonskid += "</td><td>";
+
+                                                nonskid4Snapshot.forEach(function(nonskid4ChildSnapshot){
+
+                                                    var employee_name = nonskid4ChildSnapshot.val().employee_name;
+
+                                                    myTableNonskid += "<div class='row'><div class='col-md-12'>" + employee_name + "</div></div>";
+                                                });
+
+                                                myTableNonskid += "</td></tr><tr><td>";
+
+                                                nonskid1HelperSnapshot.forEach(function(nonskid1HelperChildSnapshot){
+
+                                                    var helper_name = nonskid1HelperChildSnapshot.val().helper_name;
+
+                                                    myTableNonskid += "Helper: " + helper_name;
+                                                });
+
+                                                myTableNonskid += "</td><td>";
+
+                                                nonskid2HelperSnapshot.forEach(function(nonskid2HelperChildSnapshot){
+
+                                                    var helper_name = nonskid2HelperChildSnapshot.val().helper_name;
+
+                                                    myTableNonskid += "Helper: " + helper_name;
+                                                });
+
+                                                myTableNonskid += "</td><td>";
+
+                                                nonskid3HelperSnapshot.forEach(function(nonskid3HelperChildSnapshot){
+
+                                                    var helper_name = nonskid3HelperChildSnapshot.val().helper_name;
+
+                                                    myTableNonskid += "Helper: " + helper_name;
+                                                });
+
+                                                myTableNonskid += "</td><td>";
+
+                                                nonskid4HelperSnapshot.forEach(function(nonskid4HelperChildSnapshot){
+
+                                                    var helper_name = nonskid4HelperChildSnapshot.val().helper_name;
+
+                                                    myTableNonskid += "Helper: " + helper_name;
+                                                });
+
+                                                myTableNonskid += "</td></tr>";
+
+                                                document.getElementById('row_nonskid_list').innerHTML = myTableNonskid;
+
+                                                $(".se-pre-con").fadeOut("slow");
+                                            });
+                                        });
+                                    });
+                                });
+                            });
+                        });
+                    });
+                });
+
+                firebase.database().ref('attendance/'+plant+'/'+currentDate+query_ext+'/trucking').once('value', function(truckingSnapshot){
+
+                    myTableTrucking += "<tr><td colspan='4'><table class='table table-bordered'><thead><tr><th class='col-md-2' style='text-align: center;'>TRUCK NO.</th><th class='col-md-2' style='text-align: center;'>DRIVER</th><th class='col-md-2' style='text-align: center;'>PAHINANTE 1</th><th class='col-md-2' style='text-align: center;'>PAHINANTE 2</th><th class='col-md-3' style='text-align: center;'>COMMENT</th></tr></thead><tbody>";
+
+                    truckingSnapshot.forEach(function(truckingChildSnapshot){
+
+                        var truck_no = truckingChildSnapshot.val().truck_no;
+                        var driver = truckingChildSnapshot.val().driver;
+                        var pahinante1 = truckingChildSnapshot.val().pahinante1;
+                        var pahinante2 = truckingChildSnapshot.val().pahinante2;
+                        var comment = truckingChildSnapshot.val().comment;
+
+                        myTableTrucking += "<tr align='center'><td>" + truck_no + "</td><td>" + driver + "</td><td>" + pahinante1 + "</td><td>" + pahinante2 + "</td><td>" + comment + "</td></tr>";
+                    });
+
+                    myTableTrucking += "</tbody></table></td></tr>";
+
+                    document.getElementById('row_trucking_list').innerHTML = myTableTrucking;
+
+                });
+
+                firebase.database().ref('attendance/'+plant+'/'+currentDate+query_ext+'/forklift_operator').once('value', function(forkliftSnapshot){
+                    firebase.database().ref('attendance/'+plant+'/'+currentDate+query_ext+'/guard').once('value', function(guardSnapshot){
+                        firebase.database().ref('attendance/'+plant+'/'+currentDate+query_ext+'/guard/dayshift').once('value', function(guardDayshiftSnapshot){
+                            firebase.database().ref('attendance/'+plant+'/'+currentDate+query_ext+'/guard/nightshift').once('value', function(guardNightshiftSnapshot){
+
+                                var agency_name = guardSnapshot.val().agency_name;
+
+                                myTableForklift += "<tr><td colspan='2'><table class='table table-bordered'><thead><tr><th class='col-md-3' style='text-align: center;'>FORKLIFT NO.</th><th class='col-md-5' style='text-align: center;'>OPERATOR</th><th class='col-md-4' style='text-align: center;'>COMMENT</th></tr></thead><tbody>";
+
+                                forkliftSnapshot.forEach(function(forkliftChildSnapshot){
+
+                                    var forklift_no = forkliftChildSnapshot.val().forklift_no;
+                                    var operator = forkliftChildSnapshot.val().operator;
+                                    var comment = forkliftChildSnapshot.val().comment;
+
+                                    myTableForklift += "<tr align='center'><td>" + forklift_no + "</td><td>" + operator + "</td><td>" + comment + "</td></tr>";
+                                });
+
+                                myTableForklift += "</tbody></table></td><td colspan='2'><table class='table table-bordered'><thead><tr><th>Guard: <strong>" + agency_name + "<strong></th></tr><tr><th>DAY SHIFT</th></tr></thead><tbody><tr><td>";
+
+                                guardDayshiftSnapshot.forEach(function(guardDayshiftChildSnapshot){
+
+                                    var guard_name = guardDayshiftChildSnapshot.val().guard_name;
+                                    var position = guardDayshiftChildSnapshot.val().guard_position;
+
+                                    myTableForklift += "<div class='row'><div class='col-md-12'>" + guard_name + " - " + position + "</div></div>";
+                                });
+
+                                myTableForklift += "</td></tr></tbody><thead><tr><th>NIGHT SHIFT</th></tr></thead><tbody><tr><td>";
+
+                                guardNightshiftSnapshot.forEach(function(guardNightshiftChildSnapshot){
+
+                                    var guard_name = guardNightshiftChildSnapshot.val().guard_name;
+                                    var position = guardNightshiftChildSnapshot.val().guard_position;
+
+                                    myTableForklift += "<div class='row'><div class='col-md-12'>" + guard_name + " - " + position + "</div></div>";
+                                });
+
+                                myTableForklift += "</td></tr></tbody></table></td></tr>";
+
+                                document.getElementById('row_forklift_list').innerHTML = myTableForklift;
+                            });
+                        });
+                    });
+                });
+
+                firebase.database().ref('attendance/'+plant+'/'+currentDate+query_ext+'/absent/plant').orderByChild('employee_name').once('value', function(plantSnapshot){
+                    firebase.database().ref('attendance/'+plant+'/'+currentDate+query_ext+'/absent/motorpool').orderByChild('employee_name').once('value', function(motorpoolSnapshot){
+                        firebase.database().ref('attendance/'+plant+'/'+currentDate+query_ext+'/absent/trucking').orderByChild('employee_name').once('value', function(truckingSnapshot){
+
+                            plantCount = 0;
+                            motorpoolCount = 0;
+                            truckingCount = 0;
+
+                            myTableAbsent += "<tr><td>";
+
+                            plantSnapshot.forEach(function(plantChildSnapshot){
+
+                                if(plantChildSnapshot.val().employee_name != "N/A"){
+
+                                    var employee_name = plantChildSnapshot.val().employee_name;
+                                    var comment = plantChildSnapshot.val().employee_comment;
+
+                                    myTableAbsent += "<div class='row'><div class='col-md-12'><strong>" + employee_name + "</strong> - " + comment + "</div></div>";
+
+                                    plantCount++;
+                                }
+                            });
+
+                            if(plantCount == 0){
+                                myTableAbsent += "<div class='row'><div class='col-md-12'>N/A</div></div>";
+                            }
+
+                            document.getElementById('badge_plant').innerHTML = plantCount;
+
+                            myTableAbsent += "</td><td>";
+
+                            motorpoolSnapshot.forEach(function(motorpoolChildSnapshot){
+
+                                if(motorpoolChildSnapshot.val().employee_name != "N/A"){
+
+                                    var employee_name = motorpoolChildSnapshot.val().employee_name;
+                                    var comment = motorpoolChildSnapshot.val().employee_comment;
+
+                                    myTableAbsent += "<div class='row'><div class='col-md-12'><strong>" + employee_name + "</strong> - " + comment + "</div></div>";
+
+                                    motorpoolCount++;
+                                }
+                            });
+
+                            if(motorpoolCount == 0){
+                                myTableAbsent += "<div class='row'><div class='col-md-12'>N/A</div></div>";
+                            }
+
+                            document.getElementById('badge_motorpool').innerHTML = motorpoolCount;
+
+                            myTableAbsent += "</td><td>";
+
+                            truckingSnapshot.forEach(function(truckingChildSnapshot){
+
+                                if(truckingChildSnapshot.val().employee_name != "N/A"){
+
+                                    var employee_name = truckingChildSnapshot.val().employee_name;
+                                    var comment = truckingChildSnapshot.val().employee_comment;
+
+                                    myTableAbsent += "<div class='row'><div class='col-md-12'><strong>" + employee_name + "</strong> - " + comment + "</div></div>";
+
+                                    truckingCount++;
+                                }
+                            });
+
+                            if(truckingCount == 0){
+                                myTableAbsent += "<div class='row'><div class='col-md-12'>N/A</div></div>";
+                            }
+
+                            document.getElementById('badge_trucking').innerHTML = truckingCount;
+
+                            myTableAbsent += "</td></tr>";
+
+                            document.getElementById('row_absent_list').innerHTML = myTableAbsent;
+                        });
+                    });
+                });
+
+                firebase.database().ref('attendance/'+plant+'/'+currentDate+query_ext+'/comment').once('value', function(commentSnapshot){
+                    commentSnapshot.forEach(function(commentChildSnapshot){
+
+                        var comment_plant = commentChildSnapshot.val().comment_attendance_plant;
+                        var comment_headoffice = commentChildSnapshot.val().comment_attendance_headoffice;
+
+                        myTableComment += "<tr><td colspan='2'><div class='row'><div class='col-md-3'><strong>FROM " + plant.toUpperCase() + "</strong></div><div class='col-md-9'>" + comment_plant + "</div></div></td><td colspan='2'><div class='row'><div class='col-md-3'><strong>FROM HEAD OFFICE</strong></div><div class='col-md-9'>" + comment_headoffice + "</div></div></td></tr>";
+                    });
+                    document.getElementById('row_comment').innerHTML = myTableComment;
+                });
+
+            }else{
+
+                document.getElementById('id_schedule').innerHTML = "";
+                document.getElementById('row_office_list').innerHTML = "";
+                document.getElementById('row_new_employee_list').innerHTML = "";
+                document.getElementById('row_absent_list').innerHTML = "";
+                document.getElementById('row_nonskid_list').innerHTML = "";
+                document.getElementById('row_trucking_list').innerHTML = "";
+                document.getElementById('row_forklift_list').innerHTML = "";
+                document.getElementById('row_comment').innerHTML = "";
+
+                $(".se-pre-con").fadeOut("slow");
+            }
+        });
+
+        firebase.database().ref('attendance/Head Office/'+currentDate).once('value', function(headofficeSnapshot){
+
+            if(headofficeSnapshot.val() != null){
+
+                $('.no_data_text').hide();
+                $('.office_table').show();
+
+                var officeRow = "";
+                var loopbookRow = "";
+
+                firebase.database().ref('attendance/Head Office/'+currentDate+'/headoffice').once('value', function(noteSnapshot){
+
+                    document.getElementById('note_id').innerHTML = "<td colspan='2'>" + noteSnapshot.val().note + "</td>";
+                });
+
+                firebase.database().ref('attendance/Head Office/'+currentDate+'/headoffice/office').orderByChild('employee_name').once('value', function(officeSnapshot){
+                    officeSnapshot.forEach(function(officeChildSnapshot){
+
+                        var employee_name = officeChildSnapshot.val().employee_name;
+                        var employee_timein = officeChildSnapshot.val().employee_timein;
+                        var employee_timeout = officeChildSnapshot.val().employee_timeout;
+                        var employee_remarks = officeChildSnapshot.val().employee_remarks;
+
+                        var a = employee_timein.split(':');
+                        var employee_timein_seconds = (+a[0]) * 60 * 60 + (+a[1]);
+
+                        var b = "08:00".split(':');
+                        var timein_seconds = (+b[0]) * 60 * 60 + (+b[1]);
+
+                        if(employee_timein_seconds > timein_seconds){
+
+                            officeRow += "<tr class='header_line1'><td>" + employee_name + "</td>";
+                            officeRow += "<td>" + employee_timein + "</td>";
+                            officeRow += "<td>" + employee_timeout + "</td>";
+                            officeRow += "<td>" + employee_remarks + "</td></tr>";
+
+                        }else{
+
+                            officeRow += "<tr class='header_line1'><td>" + employee_name + "</td>";
+                            officeRow += "<td>" + employee_timein + "</td>";
+                            officeRow += "<td>" + employee_timeout + "</td>";
+                            officeRow += "<td>" + employee_remarks + "</td></tr>";
+
+                        }
+                    });
+
+                    document.getElementById('office_list').innerHTML = officeRow;
+                });
+
+                firebase.database().ref('attendance/Head Office/'+currentDate+'/headoffice/loopbook').orderByChild('employee_name').once('value', function(loopbookSnapshot){
+                    loopbookSnapshot.forEach(function(loopbookChildSnapshot){
+
+                        var employee_name = loopbookChildSnapshot.val().employee_name;
+                        var employee_timein = loopbookChildSnapshot.val().employee_timein;
+                        var employee_timeout = loopbookChildSnapshot.val().employee_timeout;
+                        var employee_remarks = loopbookChildSnapshot.val().employee_remarks;
+
+                        var a = employee_timein.split(':');
+                        var employee_timein_seconds = (+a[0]) * 60 * 60 + (+a[1]);
+
+                        var b = "08:00".split(':');
+                        var timein_seconds = (+b[0]) * 60 * 60 + (+b[1]);
+
+                        if(employee_timein_seconds > timein_seconds){
+
+                            loopbookRow += "<tr class='header_line1'><td>" + employee_name + "</td>";
+                            loopbookRow += "<td>" + employee_timein + "</td>";
+                            loopbookRow += "<td>" + employee_timeout + "</td>";
+                            loopbookRow += "<td>" + employee_remarks + "</td></tr>";
+
+                        }else{
+
+                            loopbookRow += "<tr class='header_line1'><td>" + employee_name + "</td>";
+                            loopbookRow += "<td>" + employee_timein + "</td>";
+                            loopbookRow += "<td>" + employee_timeout + "</td>";
+                            loopbookRow += "<td>" + employee_remarks + "</td></tr>";
+
+                        }
+                    });
+
+                    document.getElementById('loopbook_list').innerHTML = loopbookRow;
+                });
+            }else{
+                $('.no_data_text').show();
+                $('.office_table').hide();
+            }
+        });
+    });
+
+</script>
+<style>
+.header_line th, .header_line1 td{
+    text-align: center;
+}
+
+@media all {
+    .page-break { display: none; }
+}
+
+@media print{
+
+    .page-break { display: block; page-break-before: always; }
+    table{
+        font-size: 10px;
+        width:100%; 
+        table-layout: fixed;
+    }
+    table td{
+        word-wrap: break-word;
+
+    }
+    #printPageButton{
+        display: none;
+    }
+
+    .badge {
+        padding: 2px 6px;
+        border: 1px solid #000;
+    }
+
+    tr td{
+      padding: 2px !important;
+      margin: 2px !important;
+    }
+}
+
+</style>
+</head>
+<body>
+    <div class="se-pre-con"></div>
+    <div class="container">
+        <section id="wrapper">
+            <div class="row">
+                <div class="col-md-12">
+                    <h3 class="page-header" id="page_header"></h3>
+                </div>
+            </div>
+            <section class="panel">
+                <div class="row">
+                    <div class="col-md-12">
+                        <table class="table table-bordered table-condensed" cellpadding="0" cellspacing="0">
+                            <tbody>
+                                <tr id="id_date"></tr>
+                                <tr>
+                                    <th colspan="3">
+                                        OFFICE
+                                    </th>
+                                    <th colspan="1">
+                                        NEW EMPLOYEE
+                                    </th>
+                                </tr>
+                            </tbody>
+                            <tbody>
+                                <tr>
+                                    <td colspan="3" >
+                                        <table class="table">
+                                            <tbody>
+                                                <tr>
+                                                    <th class="col-md-3" style="text-align: center;">NAME</th>
+                                                    <th class="col-md-3" style="text-align: center;">TIME IN <span class='class_today'></span></th>
+                                                    <th class="col-md-3" style="text-align: center;">TIME OUT <span class='class_yesterday'></span></th>
+                                                </tr>
+                                            </tbody>
+                                            <tbody id="row_office_list"></tbody>
+                                        </table>
+                                    </td>
+                                    <td class="col-md-3" id="row_new_employee_list"></td>
+                                </tr>
+                            </tbody>
+                            <tbody>
+                                <tr>
+                                    <th class="col-md-3">NON-SKID 1</th>
+                                    <th class="col-md-3">NON-SKID 2</th>
+                                    <th class="col-md-3">NON-SKID 3</th>
+                                    <th class="col-md-3">NON-SKID 4</th>
+                                </tr>
+                            </tbody>
+                            <tbody id="row_nonskid_list"></tbody>
+                            <tbody>
+                                <tr>
+                                    <th colspan="4">TRUCKING</th>
+                                </tr>
+                            </tbody>
+                            <tbody id="row_trucking_list"></tbody>
+                            <tbody>
+                                <tr>
+                                    <th colspan="2">FORKLIFT</th>
+                                    <th colspan="2">GUARD</th>
+                                </tr>
+                            </tbody>
+                            <tbody id="row_forklift_list"></tbody>
+                            <tbody>
+                                <tr>
+                                    <th colspan="4">
+                                        ABSENT
+                                    </th>
+                                </tr>
+                            </tbody>
+                            <tbody>
+                                <tr>
+                                    <td colspan="4">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th class="col-md-4" style="text-align: center;">PLANT <span class="badge pull-right" id="badge_plant"></span></th>
+                                                    <th class="col-md-4" style="text-align: center;">MOTORPOOL <span class="badge pull-right" id="badge_motorpool"></span></th>
+                                                    <th class="col-md-4" style="text-align: center;">TRUCKING <span class="badge pull-right" id="badge_trucking"></span></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="row_absent_list"></tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tbody>
+                                <tr>
+                                    <th colspan="4">NOTE</th>
+                                </tr>
+                            </tbody>
+                            <tbody id="row_comment"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- <div class="page-break"></div> -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr>
+                                    <td colspan="2">
+                                        <strong>HEAD OFFICE ATTENDANCE</strong>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tbody>
+                                <tr class="no_data_text">
+                                    <td colspan="2" style='height: 100%; background: white; text-align:center; vertical-align:middle;'><h6><p class='text-muted'>No data found</p></h6></td>
+                                </tr>
+                            </tbody>
+                            <tbody class="office_table">
+                                <tr>
+                                    <td>
+                                       <table class="table table-bordered table-stripped">
+                                            <thead>
+                                                <tr>
+                                                    <th colspan="4">OFFICE</th>
+                                                </tr>
+                                                <tr class="header_line">
+                                                    <th class="col-md-7">NAME</th>
+                                                    <th class="col-md-2">TIME IN <span class='class_today'></span></th>
+                                                    <th class="col-md-2">TIME OUT <span class='class_yesterday'></span></th>
+                                                    <th class="col-md-1">REMARKS</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="office_list">
+                                                <tr>
+                                                    <td colspan="4" style='height: 100%; background: white; text-align:center; vertical-align:middle;'><h6><p class='text-muted'>No data found</p></h6></td>
+                                                </tr>
+                                            </tbody>
+                                        </table> 
+                                    </td>
+                                    <td>
+                                        <table class="table table-bordered table-stripped">
+                                            <thead>
+                                                <tr>
+                                                    <th colspan="4">LOOPBOOK</th>
+                                                </tr>
+                                                <tr class="header_line">
+                                                    <th class="col-md-7">NAME</th>
+                                                    <th class="col-md-2">TIME IN <span class='class_today'></span></th>
+                                                    <th class="col-md-2">TIME OUT <span class='class_yesterday'></span></th>
+                                                    <th class="col-md-1">REMARKS</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="loopbook_list">
+                                                <tr>
+                                                    <td colspan="4" style='height: 100%; background: white; text-align:center; vertical-align:middle;'><h6><p class='text-muted'>No data found</p></h6></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2"><strong>NOTE</strong></td>
+                                </tr>
+                                <tr id="note_id">
+                                    <td colspan="2" style='height: 100%; background: white; text-align:center; vertical-align:middle;'><h6><p class='text-muted'>No data found</p></h6></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </section>
+    </div>
+</body>
+</html>
